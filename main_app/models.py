@@ -78,3 +78,45 @@ class ArtworkGallery(models.Model):
         decimal_places=2,
     )
 
+
+# Task 2
+class Laptop(models.Model):
+    LAPTOP_BRANDS_CHOICES = (
+        ("Asus", "Asus"),
+        ("Acer", "Acer"),
+        ("Apple", "Apple"),
+        ("Lenovo", "Lenovo"),
+        ("Dell", "Dell"),
+    )
+
+    OPERATION_SYSTEMS_CHOICES = (
+        ("Windows","Windows"),
+        ("MacOS","MacOS"),
+        ("Linux","Linux"),
+        ("Chrome OS","Chrome OS"),
+    )
+
+    brand = models.CharField(
+        choices=LAPTOP_BRANDS_CHOICES,
+    )
+
+    processor = models.CharField(
+        max_length=100,
+    )
+
+    memory = models.PositiveIntegerField(
+        verbose_name="Memory in GB",
+    )
+
+    storage = models.PositiveIntegerField(
+        verbose_name="Storage in GB",
+    )
+
+    operation_system = models.CharField(
+        choices=OPERATION_SYSTEMS_CHOICES,
+    )
+
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+    )

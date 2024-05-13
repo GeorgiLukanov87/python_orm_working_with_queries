@@ -5,7 +5,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm_skeleton.settings")
 django.setup()
 
-from main_app.models import ArtworkGallery
+from main_app.models import ArtworkGallery, Laptop
 
 
 # Task 1
@@ -36,3 +36,123 @@ def delete_negative_rated_arts() -> None:
 # delete_negative_rated_arts()
 
 # print(ArtworkGallery.objects.all())
+
+
+# Task2
+def show_the_most_expensive_laptop() -> str:
+    expensive_laptop = Laptop.objects.all().order_by('-price', 'id').first()
+
+    return f"{expensive_laptop.brand} is the most expensive laptop available for {expensive_laptop.price}$!"
+
+
+# print(show_the_most_expensive_laptop())
+
+
+def bulk_create_laptops(*args):
+    new_laptops = []
+
+    for laptop in args:
+        new_laptops.append(laptop)
+
+    Laptop.objects.bulk_create(*new_laptops)
+
+
+# Create a list of instances
+# laptops_to_create = [laptop1, laptop2, laptop3]
+# bulk_create_laptops(laptops_to_create)
+def update_to_512_GB_storage() -> None:
+    all_laptops = Laptop.objects.all()
+
+    for laptop in all_laptops:
+        if laptop.brand in ["Asus", "Lenovo"]:
+            laptop.storage = 512
+            laptop.save()
+
+
+# update_to_512_GB_storage()
+
+
+def update_to_16_GB_memory() -> None:
+    all_laptops = Laptop.objects.all()
+
+    for laptop in all_laptops:
+        if laptop.brand in ["Apple", "Dell"]:
+            laptop.memory = 16
+            laptop.save()
+
+
+# update_to_16_GB_memory()
+
+
+def update_operation_systems() -> None:
+    all_laptops = Laptop.objects.all()
+
+    for laptop in all_laptops:
+        if laptop.brand in ["Dell", "Acer"]:
+            laptop.operation_system = "Linux"
+            laptop.save()
+
+    Laptop.objects.filter(brand="Asus").update(
+        operation_system='Windows'
+    )
+
+    Laptop.objects.filter(brand="Apple").update(
+        operation_system='MacOS'
+    )
+
+    Laptop.objects.filter(brand="Lenovo").update(
+        operation_system='Chrome OS'
+    )
+
+
+# update_operation_systems()
+
+def delete_inexpensive_laptops() -> None:
+    Laptop.objects.filter(price__lt=1200).delete()
+
+# delete_inexpensive_laptops()
+
+laptop1 = Laptop(
+    brand='Asus',
+    processor='Intel Core i5',
+    memory=8,
+    storage=256,
+    operation_system='Windows',
+    price=899.99
+)
+
+laptop2 = Laptop(
+    brand='Apple',
+    processor='Apple M1',
+    memory=16,
+    storage=512,
+    operation_system='MacOS',
+    price=1399.99
+
+)
+
+laptop3 = Laptop(
+    brand='Lenovo',
+    processor='AMD Ryzen 7',
+    memory=12,
+    storage=512,
+    operation_system='Linux',
+    price=999.99,
+)
+
+# # Create a list of instances
+# laptops_to_create = [laptop1, laptop2, laptop3]
+#
+# # Use bulk_create to save the instances
+# bulk_create_laptops(laptops_to_create)
+#
+# # Execute the following functions
+# update_to_512_GB_storage()
+# update_operation_systems()
+#
+# # Retrieve 2 laptops from the database
+# asus_laptop = Laptop.objects.filter(brand__exact='Asus').get()
+# lenovo_laptop = Laptop.objects.filter(brand__exact='Lenovo').get()
+#
+# print(asus_laptop.storage)
+# print(lenovo_laptop.operation_system)
