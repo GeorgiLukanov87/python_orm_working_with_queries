@@ -87,7 +87,7 @@ def update_to_16_GB_memory() -> None:
     Laptop.objects.filter(brand__in=["Apple", "Dell", "Acer"]).update(memory=16)
 
 
-update_to_16_GB_memory()
+# update_to_16_GB_memory()
 
 
 def update_operation_systems() -> None:
@@ -174,3 +174,5 @@ laptop3 = Laptop(
 #
 # print(asus_laptop.storage)
 # print(lenovo_laptop.operation_system)
+
+# Task 3
