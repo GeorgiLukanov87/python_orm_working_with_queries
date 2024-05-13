@@ -1,5 +1,6 @@
 import os
 import django
+from django.db.models import Q, Case, When, Value, F
 
 # Set up Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm_skeleton.settings")
@@ -30,7 +31,7 @@ def bulk_create_arts(first_art: ArtworkGallery, second_art: ArtworkGallery) -> N
 
 
 def delete_negative_rated_arts() -> None:
-    ArtworkGallery.objects.filter(rating__lt=0).update(rating=0)
+    ArtworkGallery.objects.filter(rating__lt=0).delete()
 
 
 # delete_negative_rated_arts()
@@ -61,54 +62,71 @@ def bulk_create_laptops(*args):
 # laptops_to_create = [laptop1, laptop2, laptop3]
 # bulk_create_laptops(laptops_to_create)
 def update_to_512_GB_storage() -> None:
-    all_laptops = Laptop.objects.all()
+    # all_laptops = Laptop.objects.all()
+    #
+    # for laptop in all_laptops:
+    #     if laptop.brand in ["Asus", "Lenovo"]:
+    #         laptop.storage = 512
+    #         laptop.save()
 
-    for laptop in all_laptops:
-        if laptop.brand in ["Asus", "Lenovo"]:
-            laptop.storage = 512
-            laptop.save()
+    Laptop.objects.filter(Q(brand="Lenovo") | Q(brand="Asus")).update(storage=512)
+    # Laptop.objects.filter(brand__in=["Lenovo","Asus"]).update(storage=512)
 
 
 # update_to_512_GB_storage()
 
 
 def update_to_16_GB_memory() -> None:
-    all_laptops = Laptop.objects.all()
+    # all_laptops = Laptop.objects.all()
+    #
+    # for laptop in all_laptops:
+    #     if laptop.brand in ["Apple", "Dell", "Acer"]:
+    #         laptop.memory = 16
+    #         laptop.save()
 
-    for laptop in all_laptops:
-        if laptop.brand in ["Apple", "Dell"]:
-            laptop.memory = 16
-            laptop.save()
+    Laptop.objects.filter(brand__in=["Apple", "Dell", "Acer"]).update(memory=16)
 
 
-# update_to_16_GB_memory()
+update_to_16_GB_memory()
 
 
 def update_operation_systems() -> None:
-    all_laptops = Laptop.objects.all()
+    # all_laptops = Laptop.objects.all()
+    #
+    # for laptop in all_laptops:
+    #     if laptop.brand in ["Dell", "Acer"]:
+    #         laptop.operation_system = "Linux"
+    #         laptop.save()
+    #
+    # Laptop.objects.filter(brand="Asus").update(
+    #     operation_system='Windows'
+    # )
+    #
+    # Laptop.objects.filter(brand="Apple").update(
+    #     operation_system='MacOS'
+    # )
+    #
+    # Laptop.objects.filter(brand="Lenovo").update(
+    #     operation_system='Chrome OS'
+    # )
 
-    for laptop in all_laptops:
-        if laptop.brand in ["Dell", "Acer"]:
-            laptop.operation_system = "Linux"
-            laptop.save()
-
-    Laptop.objects.filter(brand="Asus").update(
-        operation_system='Windows'
-    )
-
-    Laptop.objects.filter(brand="Apple").update(
-        operation_system='MacOS'
-    )
-
-    Laptop.objects.filter(brand="Lenovo").update(
-        operation_system='Chrome OS'
+    Laptop.objects.update(
+        operation_system=Case(
+            When(brand="Asus", then=Value("Windows")),
+            When(brand__in=["Dell", "Acer"], then=Value("Linux")),
+            When(brand="Apple", then=Value("MacOS")),
+            When(brand="Lenovo", then=Value("Chrome OS")),
+            default=F('operation_system')
+        )
     )
 
 
 # update_operation_systems()
 
+
 def delete_inexpensive_laptops() -> None:
     Laptop.objects.filter(price__lt=1200).delete()
+
 
 # delete_inexpensive_laptops()
 
