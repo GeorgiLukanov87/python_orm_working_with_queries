@@ -1,6 +1,6 @@
 import os
 import django
-from django.db.models import Q, Case, When, Value, F
+from django.db.models import Q, Case, When, Value, F, IntegerField
 
 # Set up Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm_skeleton.settings")
@@ -429,15 +429,25 @@ update_dungeon_bosses_health()
 
 
 def update_dungeon_recommended_levels() -> None:
-    Dungeon.objects.filter(difficulty='Easy').update(
-        recommended_level=25
-    )
+    # Dungeon.objects.filter(difficulty='Easy').update(
+    #     recommended_level=25
+    # )
+    #
+    # Dungeon.objects.filter(difficulty='Medium').update(
+    #     recommended_level=50
+    # )
+    # Dungeon.objects.filter(difficulty='Hard').update(
+    #     recommended_level=75
+    # )
 
-    Dungeon.objects.filter(difficulty='Medium').update(
-        recommended_level=50
-    )
-    Dungeon.objects.filter(difficulty='Hard').update(
-        recommended_level=75
+    Dungeon.objects.update(
+        recommended_level=Case(
+            When(difficulty="Easy", then=Value(25)),
+            When(difficulty="Medium", then=Value(50)),
+            When(difficulty="Hard", then=Value(75)),
+            default=Value(0),  # Default value in case none of the conditions match
+            output_field=IntegerField()
+        )
     )
 
 
@@ -534,6 +544,5 @@ def set_new_duration_times() -> None:
 def delete_workouts() -> None:
     workouts_to_delete = Workout.objects.exclude(workout_type__in=['Strength', 'Calisthenics'])
     workouts_to_delete.delete()
-
 
 # delete_workouts()
