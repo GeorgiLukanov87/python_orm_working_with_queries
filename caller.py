@@ -6,7 +6,7 @@ from django.db.models import Q, Case, When, Value, F
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm_skeleton.settings")
 django.setup()
 
-from main_app.models import ArtworkGallery, Laptop, ChessPlayer, Meal, Dungeon
+from main_app.models import ArtworkGallery, Laptop, ChessPlayer, Meal, Dungeon, Workout
 
 
 # Task 1
@@ -422,10 +422,10 @@ def update_dungeon_names() -> None:
 
 
 def update_dungeon_bosses_health() -> None:
-    Dungeon.objects.filter(difficulty__in=['Hard', 'Medium']).update(boss_health=500)
+    Dungeon.objects.exclude(difficulty__in=['Easy']).update(boss_health=500)
 
 
-# update_dungeon_bosses_health()
+update_dungeon_bosses_health()
 
 
 def update_dungeon_recommended_levels() -> None:
@@ -467,4 +467,73 @@ def set_new_locations() -> None:
 
 
 # Task 6
+def show_workouts() -> str:
+    filtered_workouts = Workout.objects.filter(workout_type__in=['Calisthenics', 'CrossFit'])
 
+    return '\n'.join(str(wo) for wo in filtered_workouts)
+
+
+# workout1 = Workout.objects.create(
+#     name="Push-Ups",
+#     workout_type="Calisthenics",
+#     duration="10 minutes",
+#     difficulty="Intermediate",
+#     calories_burned=200,
+#     instructor="Chris Heria"
+# )
+#
+# workout2 = Workout.objects.create(
+#     name="Running",
+#     workout_type="Cardio",
+#     duration="30 minutes",
+#     difficulty="High",
+#     calories_burned=400,
+#     instructor="John Smith"
+# )
+
+# print(show_workouts())
+def get_high_difficulty_cardio_workouts() -> Workout:
+    return Workout.objects.filter(workout_type='Cardio').filter(difficulty='High').order_by('instructor')
+
+
+# print(get_high_difficulty_cardio_workouts())
+
+
+def set_new_instructors() -> None:
+    Workout.objects.update(
+        instructor=Case(
+            When(workout_type='Cardio', then=Value('John Smith')),
+            When(workout_type='Strength', then=Value('Michael Williams')),
+            When(workout_type='Yoga', then=Value('Emily Johnson')),
+            When(workout_type='CrossFit', then=Value('Sarah Davis')),
+            When(workout_type='Calisthenics', then=Value('Chris Heria')),
+            default=F('workout_type'),
+        )
+    )
+
+
+# set_new_instructors()
+
+
+def set_new_duration_times() -> None:
+    Workout.objects.update(
+        duration=Case(
+            When(instructor='John Smith', then=Value('15 minutes')),
+            When(instructor='John Smith', then=Value('15 minutes')),
+            When(instructor='Sarah Davis', then=Value('30 minutes')),
+            When(instructor='Chris Heria', then=Value('45 minutes')),
+            When(instructor='Michael Williams', then=Value('1 hour')),
+            When(instructor='Emily Johnson', then=Value('1 hour and 30 minutes')),
+            default=F('instructor'),
+        )
+    )
+
+
+# set_new_duration_times()
+
+def delete_workouts() -> None:
+    workouts_to_delete = Workout.objects.exclude(workout_type__in=['Strength', 'Calisthenics'])
+    workouts_to_delete.delete()
+
+
+# delete_workouts()

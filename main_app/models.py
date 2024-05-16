@@ -128,3 +128,6 @@ class Workout(models.Model):
     difficulty = models.CharField(max_length=50)
     calories_burned = models.PositiveIntegerField()
     instructor = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.name} from {self.workout_type} type has {self.difficulty} difficulty!"
