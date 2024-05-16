@@ -6,7 +6,7 @@ from django.db.models import Q, Case, When, Value, F
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm_skeleton.settings")
 django.setup()
 
-from main_app.models import ArtworkGallery, Laptop, ChessPlayer, Meal
+from main_app.models import ArtworkGallery, Laptop, ChessPlayer, Meal, Dungeon
 
 
 # Task 1
@@ -367,3 +367,104 @@ def delete_lunch_and_snack_meals() -> None:
 # print("Meal 1 Preparation Time:", meal1.preparation_time)
 # print("Meal 2 Chef:", meal2.chef)
 # print("Meal 2 Preparation Time:", meal2.preparation_time)
+
+
+# Task 5
+def show_hard_dungeons() -> str:
+    hard_dungeons = Dungeon.objects.filter(difficulty='Hard').order_by('location')
+
+    return f'\n'.join(str(d) for d in hard_dungeons)
+
+
+dungeon3 = Dungeon(
+    name="Dungeon 3",
+    boss_name="Boss 3",
+    boss_health=2000,
+    recommended_level=175,
+    reward="Gold",
+    location="Eternal Hell 2",
+    difficulty="Hard",
+)
+
+dungeon4 = Dungeon(
+    name="Dungeon 4",
+    boss_name="Boss 4",
+    boss_health=1500,
+    recommended_level=125,
+    reward="Experience",
+    location="Crystal Caverns",
+    difficulty="Easy",
+)
+
+
+# print(show_hard_dungeons())
+
+
+def bulk_create_dungeons(*args: Dungeon) -> None:
+    Dungeon.objects.bulk_create(*args)
+
+
+# bulk_create_dungeons([dungeon3, dungeon4])
+
+
+def update_dungeon_names() -> None:
+    Dungeon.objects.update(
+        name=Case(
+            When(difficulty='Easy', then=Value('The Erased Thombs')),
+            When(difficulty='Medium', then=Value('The Coral Labyrinth')),
+            When(difficulty='Hard', then=Value('The Lost Haunt')),
+            default=F('difficulty'),
+        )
+    )
+
+
+# update_dungeon_names()
+
+
+def update_dungeon_bosses_health() -> None:
+    Dungeon.objects.filter(difficulty__in=['Hard', 'Medium']).update(boss_health=500)
+
+
+# update_dungeon_bosses_health()
+
+
+def update_dungeon_recommended_levels() -> None:
+    Dungeon.objects.filter(difficulty='Easy').update(
+        recommended_level=25
+    )
+
+    Dungeon.objects.filter(difficulty='Medium').update(
+        recommended_level=50
+    )
+    Dungeon.objects.filter(difficulty='Hard').update(
+        recommended_level=75
+    )
+
+
+# update_dungeon_recommended_levels()
+
+
+def update_dungeon_rewards() -> None:
+    Dungeon.objects.filter(boss_health=500).update(reward='1000 Gold')
+    Dungeon.objects.filter(location__startswith='E').update(reward='New dungeon unlocked')
+    Dungeon.objects.filter(location__endswith='s').update(reward='Dragonheart Amulet')
+
+
+# update_dungeon_rewards()
+
+
+def set_new_locations() -> None:
+    Dungeon.objects.update(
+        location=Case(
+            When(recommended_level=25, then=Value('Enchanted Maze')),
+            When(recommended_level=50, then=Value('Brimstone Mines')),
+            When(recommended_level=75, then=Value('Shadowed Abyss')),
+        )
+    )
+
+
+# set_new_locations()
+
+
+# Task 6
+
